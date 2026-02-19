@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>DASBOARD JABATAN FUNGSIONAL</title>
+<title>DASHBOARD JABATAN FUNGSIONAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- ICON -->
@@ -13,36 +13,47 @@
 :root{
   --pri:#2563eb;
   --bg:#f8fafc;
-  --card:#fff;
+  --card:#ffffff;
   --line:#e5e7eb;
+  --text:#0f172a;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:Inter,Segoe UI,Arial;
   background:var(--bg);
+  color:var(--text);
 }
+
+/* HEADER */
 header{
   padding:12px 22px;
   background:linear-gradient(135deg,#2563eb,#1e40af);
   color:#fff;
 }
-header h1{margin:0;font-size:18px}
+header h1{
+  margin:0;
+  font-size:18px;
+  letter-spacing:.3px;
+}
 
+/* CONTAINER */
 .container{padding:14px}
 
+/* SEARCH */
 .search{
-  max-width:300px;
-  margin-bottom:8px;
+  max-width:320px;
+  margin-bottom:10px;
 }
 .search input{
   width:100%;
-  padding:7px 10px;
-  font-size:12px;
-  border-radius:8px;
+  padding:8px 12px;
+  font-size:13px;
+  border-radius:999px;
   border:1px solid #c7d2fe;
 }
 
+/* TABLE BOX */
 .table-box{
   background:var(--card);
   border-radius:14px;
@@ -51,41 +62,67 @@ header h1{margin:0;font-size:18px}
   box-shadow:0 8px 18px rgba(0,0,0,.06);
 }
 
+/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
+  table-layout:fixed;
   font-size:12px;
 }
+
+/* HEADER FREEZE */
 thead th{
   position:sticky;
   top:0;
   background:#eef2ff;
   z-index:2;
 }
+
+/* CELL */
 th,td{
-  padding:7px 10px;
+  padding:8px 10px;
   border-bottom:1px solid var(--line);
-  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
+
+/* COLUMN WIDTH */
+th:nth-child(1), td:nth-child(1){ width:24%; }
+th:nth-child(2), td:nth-child(2){ width:18%; }
+th:nth-child(3), td:nth-child(3){ width:14%; }
+th:nth-child(4), td:nth-child(4){ width:6%; text-align:center; }
+th:nth-child(5), td:nth-child(5){ width:38%; }
+
+/* ROW */
 tbody tr:hover{background:#f1f5f9}
 
-.catatan{
-  width:200px;
-  min-height:32px;
-  font-size:11px;
-  padding:5px;
-  border-radius:6px;
-  border:1px solid #c7d2fe;
+/* NAMA PEGAWAI */
+td.nama{
+  font-size:14px;
+  font-weight:600;
+  color:#0f172a;
 }
 
+/* CATATAN */
+.catatan{
+  width:100%;
+  min-height:32px;
+  font-size:12px;
+  padding:6px;
+  border-radius:8px;
+  border:1px solid #c7d2fe;
+  background:#f8fafc;
+}
+
+/* BUTTON */
 .btn{
   margin-top:4px;
   font-size:11px;
-  padding:4px 10px;
+  padding:5px 14px;
   border:none;
-  border-radius:6px;
+  border-radius:999px;
   cursor:pointer;
-  background:var(--pri);
+  background:linear-gradient(135deg,#2563eb,#1e40af);
   color:#fff;
 }
 .btn.loading{
@@ -93,38 +130,40 @@ tbody tr:hover{background:#f1f5f9}
   cursor:wait;
 }
 
+/* FOLDER ICON */
 .folder a{
-  color:var(--pri);
-  font-size:16px;
+  color:#2563eb;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
+
 <header>
-  <h1>DASBOARD JABATAN FUNGSIONAL</h1>
+  <h1>DASHBOARD JABATAN FUNGSIONAL</h1>
 </header>
 
 <div class="container">
 
-<div class="search">
-  <input id="search" placeholder="Cari nama pegawai...">
-</div>
+  <div class="search">
+    <input id="search" placeholder="Cari nama pegawai...">
+  </div>
 
-<div class="table-box">
-<table>
-<thead>
-<tr>
-  <th>Nama</th>
-  <th>NIP</th>
-  <th>HP</th>
-  <th>Folder</th>
-  <th>Catatan</th>
-</tr>
-</thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>NIP</th>
+          <th>HP</th>
+          <th>Folder</th>
+          <th>Catatan</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
 
 </div>
 
@@ -136,27 +175,29 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbybmvR69DeeJAGZUOJkllGj
 
 let data=[];
 
+/* LOAD DATA */
 fetch(SHEET)
 .then(r=>r.text())
 .then(t=>{
-  const j=JSON.parse(t.substr(47).slice(0,-2));
-  data=j.table.rows.reverse();
+  const j = JSON.parse(t.substr(47).slice(0,-2));
+  data = j.table.rows.reverse();
   render(data);
 });
 
+/* RENDER TABLE */
 function render(arr){
-  const tb=document.getElementById("rows");
+  const tb = document.getElementById("rows");
   tb.innerHTML="";
   arr.forEach(r=>{
-    const nama=r.c[0]?.v||"";
-    const nip=r.c[1]?.v||"";
-    const hp=r.c[2]?.v||"";
-    const folder=r.c[5]?.v||"";
-    const cat=r.c[6]?.v||"";
+    const nama = r.c[0]?.v || "";
+    const nip = r.c[1]?.v || "";
+    const hp = r.c[2]?.v || "";
+    const folder = r.c[5]?.v || "";
+    const cat = r.c[6]?.v || "";
 
-    tb.innerHTML+=`
+    tb.innerHTML += `
     <tr>
-      <td>${nama}</td>
+      <td class="nama">${nama}</td>
       <td>${nip}</td>
       <td>${hp}</td>
       <td class="folder">
@@ -166,16 +207,16 @@ function render(arr){
       </td>
       <td>
         <textarea class="catatan" id="c_${nip}">${cat}</textarea>
-        <button class="btn" id="b_${nip}"
-          onclick="save('${nip}')">Save</button>
+        <button class="btn" id="b_${nip}" onclick="save('${nip}')">Save</button>
       </td>
     </tr>`;
   });
 }
 
+/* SAVE CATATAN */
 function save(nip){
-  const btn=document.getElementById("b_"+nip);
-  const cat=document.getElementById("c_"+nip).value;
+  const btn = document.getElementById("b_"+nip);
+  const cat = document.getElementById("c_"+nip).value;
 
   btn.textContent="Saving...";
   btn.classList.add("loading");
@@ -198,10 +239,12 @@ function save(nip){
   },700);
 }
 
-document.getElementById("search").oninput=e=>{
-  const q=e.target.value.toLowerCase();
+/* SEARCH */
+document.getElementById("search").oninput = e=>{
+  const q = e.target.value.toLowerCase();
   render(data.filter(r=>r.c[0]?.v.toLowerCase().includes(q)));
 };
 </script>
+
 </body>
 </html>
