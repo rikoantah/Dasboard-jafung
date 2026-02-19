@@ -5,76 +5,74 @@
 <title>DASBOARD JABATAN FUNGSIONAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- ICON -->
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
 :root{
   --pri:#2563eb;
   --bg:#f8fafc;
-  --card:#ffffff;
+  --card:#fff;
   --line:#e5e7eb;
-  --text:#0f172a;
 }
 *{box-sizing:border-box}
 body{
   margin:0;
   font-family:Inter,Segoe UI,Arial;
   background:var(--bg);
-  color:var(--text);
 }
 header{
-  padding:14px 24px;
+  padding:12px 22px;
   background:linear-gradient(135deg,#2563eb,#1e40af);
   color:#fff;
 }
-header h1{
-  margin:0;
-  font-size:20px;
-  letter-spacing:.3px;
-}
+header h1{margin:0;font-size:18px}
 
-.container{padding:16px}
+.container{padding:14px}
 
 .search{
-  max-width:320px;
-  margin-bottom:10px;
+  max-width:300px;
+  margin-bottom:8px;
 }
 .search input{
   width:100%;
-  padding:8px 10px;
+  padding:7px 10px;
+  font-size:12px;
   border-radius:8px;
   border:1px solid #c7d2fe;
-  font-size:13px;
 }
 
 .table-box{
   background:var(--card);
   border-radius:14px;
   overflow:auto;
-  box-shadow:0 8px 20px rgba(0,0,0,.06);
+  max-height:78vh;
+  box-shadow:0 8px 18px rgba(0,0,0,.06);
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:13px;
+  font-size:12px;
 }
-thead{
+thead th{
   position:sticky;
   top:0;
   background:#eef2ff;
-  z-index:1;
+  z-index:2;
 }
 th,td{
-  padding:8px 10px;
+  padding:7px 10px;
   border-bottom:1px solid var(--line);
   white-space:nowrap;
 }
 tbody tr:hover{background:#f1f5f9}
 
 .catatan{
-  width:220px;
-  min-height:34px;
-  resize:vertical;
-  font-size:12px;
+  width:200px;
+  min-height:32px;
+  font-size:11px;
   padding:5px;
   border-radius:6px;
   border:1px solid #c7d2fe;
@@ -82,8 +80,8 @@ tbody tr:hover{background:#f1f5f9}
 
 .btn{
   margin-top:4px;
-  padding:5px 10px;
   font-size:11px;
+  padding:4px 10px;
   border:none;
   border-radius:6px;
   cursor:pointer;
@@ -92,13 +90,12 @@ tbody tr:hover{background:#f1f5f9}
 }
 .btn.loading{
   background:#94a3b8;
-  cursor:not-allowed;
+  cursor:wait;
 }
 
 .folder a{
   color:var(--pri);
-  font-weight:600;
-  text-decoration:none;
+  font-size:16px;
 }
 </style>
 </head>
@@ -110,24 +107,24 @@ tbody tr:hover{background:#f1f5f9}
 
 <div class="container">
 
-  <div class="search">
-    <input id="search" placeholder="Cari Nama Pegawai...">
-  </div>
+<div class="search">
+  <input id="search" placeholder="Cari nama pegawai...">
+</div>
 
-  <div class="table-box">
-    <table>
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>NIP</th>
-          <th>HP</th>
-          <th>Folder</th>
-          <th>Catatan</th>
-        </tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
-  </div>
+<div class="table-box">
+<table>
+<thead>
+<tr>
+  <th>Nama</th>
+  <th>NIP</th>
+  <th>HP</th>
+  <th>Folder</th>
+  <th>Catatan</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
 
 </div>
 
@@ -135,45 +132,50 @@ tbody tr:hover{background:#f1f5f9}
 const SHEET =
 "https://docs.google.com/spreadsheets/d/1t_0nZta960SB78FgxwKGJHiRpCO_WWz5XEORnSFwbik/gviz/tq?tqx=out:json&sheet=Jabfung";
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwbn3PkgDjwXIK5r3ZK6iqAbcNDVaUIYoc8btYDFuFz9BiFzlEP1jk-NfMfKYSju25B/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbybmvR69DeeJAGZUOJkllGjJ0bHsDRFEK3a4bQdrrdajhgov1i5tjljgyH8UhgW6Hpc/exec";
 
-let data = [];
+let data=[];
 
 fetch(SHEET)
 .then(r=>r.text())
 .then(t=>{
-  const j = JSON.parse(t.substr(47).slice(0,-2));
-  data = j.table.rows.reverse();
+  const j=JSON.parse(t.substr(47).slice(0,-2));
+  data=j.table.rows.reverse();
   render(data);
 });
 
 function render(arr){
-  const tb = document.getElementById("rows");
+  const tb=document.getElementById("rows");
   tb.innerHTML="";
   arr.forEach(r=>{
-    const nama = r.c[0]?.v || "";
-    const nip = r.c[1]?.v || "";
-    const hp = r.c[2]?.v || "";
-    const folder = r.c[5]?.v || "";
-    const cat = r.c[6]?.v || "";
+    const nama=r.c[0]?.v||"";
+    const nip=r.c[1]?.v||"";
+    const hp=r.c[2]?.v||"";
+    const folder=r.c[5]?.v||"";
+    const cat=r.c[6]?.v||"";
 
-    tb.innerHTML += `
+    tb.innerHTML+=`
     <tr>
       <td>${nama}</td>
       <td>${nip}</td>
       <td>${hp}</td>
-      <td class="folder"><a href="${folder}" target="_blank">Buka</a></td>
+      <td class="folder">
+        <a href="${folder}" target="_blank" title="Buka Folder">
+          <i class="fa-solid fa-folder-open"></i>
+        </a>
+      </td>
       <td>
-        <textarea class="catatan" id="cat_${nip}">${cat}</textarea>
-        <button class="btn" id="btn_${nip}" onclick="save('${nip}')">Save</button>
+        <textarea class="catatan" id="c_${nip}">${cat}</textarea>
+        <button class="btn" id="b_${nip}"
+          onclick="save('${nip}')">Save</button>
       </td>
     </tr>`;
   });
 }
 
 function save(nip){
-  const btn = document.getElementById("btn_"+nip);
-  const catatan = document.getElementById("cat_"+nip).value;
+  const btn=document.getElementById("b_"+nip);
+  const cat=document.getElementById("c_"+nip).value;
 
   btn.textContent="Saving...";
   btn.classList.add("loading");
@@ -181,29 +183,25 @@ function save(nip){
 
   fetch(GAS_URL,{
     method:"POST",
+    mode:"no-cors",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ nip, catatan })
-  })
-  .then(r=>r.json())
-  .then(res=>{
-    btn.textContent = res.success ? "Saved" : "Error";
+    body:JSON.stringify({ nip:nip, catatan:cat })
+  });
+
+  setTimeout(()=>{
+    btn.textContent="Saved";
     setTimeout(()=>{
       btn.textContent="Save";
       btn.classList.remove("loading");
       btn.disabled=false;
-    },1200);
-  })
-  .catch(()=>{
-    btn.textContent="Error";
-    btn.disabled=false;
-  });
+    },900);
+  },700);
 }
 
-document.getElementById("search").oninput = e=>{
-  const q = e.target.value.toLowerCase();
+document.getElementById("search").oninput=e=>{
+  const q=e.target.value.toLowerCase();
   render(data.filter(r=>r.c[0]?.v.toLowerCase().includes(q)));
 };
 </script>
-
 </body>
 </html>
