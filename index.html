@@ -209,7 +209,7 @@ function render(arr){
           <option value="Pengajuan" ${status==="Pengajuan"?"selected":""}>Pengajuan</option>
           <option value="Selesai" ${status==="Selesai"?"selected":""}>Selesai</option>
         </select>
-        <button class="btn" onclick="saveStatus('${nip}')">Save</button>
+        <button class="btn" id="bs_${nip}" onclick="saveStatus('${nip}')">Save</button>
       </td>
     </tr>`;
   });
@@ -238,8 +238,15 @@ function save(nip){
 }
 
 function saveStatus(nip){
-  const status = document.getElementById("s_"+nip).value;
+  const select = document.getElementById("s_"+nip);
+  const btn = document.getElementById("bs_"+nip);
+  const status = select.value;
+
   if(!status) return;
+
+  btn.textContent="Saving...";
+  btn.classList.add("loading");
+  btn.disabled=true;
 
   fetch(GAS_URL,{
     method:"POST",
@@ -247,6 +254,15 @@ function saveStatus(nip){
     headers:{ "Content-Type":"application/json" },
     body:JSON.stringify({ nip:nip, status:status })
   });
+
+  setTimeout(()=>{
+    btn.textContent="Saved";
+    setTimeout(()=>{
+      btn.textContent="Save";
+      btn.classList.remove("loading");
+      btn.disabled=false;
+    },800);
+  },700);
 }
 
 document.getElementById("search").oninput = e=>{
