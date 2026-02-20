@@ -32,7 +32,6 @@ header{
 header h1{
   margin:0;
   font-size:18px;
-  letter-spacing:.3px;
 }
 
 .container{padding:14px}
@@ -74,24 +73,20 @@ thead th{
 th,td{
   padding:8px 10px;
   border-bottom:1px solid var(--line);
-  overflow:hidden;
-  text-overflow:ellipsis;
 }
 
-/* COLUMN WIDTH UPDATE */
-th:nth-child(1), td:nth-child(1){ width:20%; }
-th:nth-child(2), td:nth-child(2){ width:16%; }
+th:nth-child(1), td:nth-child(1){ width:18%; }
+th:nth-child(2), td:nth-child(2){ width:15%; }
 th:nth-child(3), td:nth-child(3){ width:12%; }
 th:nth-child(4), td:nth-child(4){ width:6%; text-align:center; }
-th:nth-child(5), td:nth-child(5){ width:28%; }
-th:nth-child(6), td:nth-child(6){ width:18%; }
+th:nth-child(5), td:nth-child(5){ width:27%; }
+th:nth-child(6), td:nth-child(6){ width:22%; }
 
 tbody tr:hover{background:#f1f5f9}
 
 td.nama{
   font-size:14px;
   font-weight:600;
-  color:#0f172a;
 }
 
 .catatan{
@@ -123,6 +118,7 @@ td.nama{
   background:linear-gradient(135deg,#2563eb,#1e40af);
   color:#fff;
 }
+
 .btn.loading{
   background:#94a3b8;
   cursor:wait;
@@ -156,7 +152,7 @@ td.nama{
           <th>HP</th>
           <th>Folder</th>
           <th>Catatan</th>
-          <th>Pengajuan</th>
+          <th>Status Pengajuan</th>
         </tr>
       </thead>
       <tbody id="rows"></tbody>
@@ -169,7 +165,8 @@ td.nama{
 const SHEET =
 "https://docs.google.com/spreadsheets/d/1t_0nZta960SB78FgxwKGJHiRpCO_WWz5XEORnSFwbik/gviz/tq?tqx=out:json&sheet=Jabfung";
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbybmvR69DeeJAGZUOJkllGjJ0bHsDRFEK3a4bQdrrdajhgov1i5tjljgyH8UhgW6Hpc/exec";
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbybmvR69DeeJAGZUOJkllGjJ0bHsDRFEK3a4bQdrrdajhgov1i5tjljgyH8UhgW6Hpc/exec";
 
 let data=[];
 
@@ -190,7 +187,7 @@ function render(arr){
     const hp = r.c[2]?.v || "";
     const folder = r.c[5]?.v || "";
     const cat = r.c[6]?.v || "";
-    const status = r.c[7]?.v || "Pengajuan";
+    const status = r.c[7]?.v || "";
 
     tb.innerHTML += `
     <tr>
@@ -208,9 +205,11 @@ function render(arr){
       </td>
       <td>
         <select class="status" id="s_${nip}">
+          <option value="">-- pilih --</option>
           <option value="Pengajuan" ${status==="Pengajuan"?"selected":""}>Pengajuan</option>
           <option value="Selesai" ${status==="Selesai"?"selected":""}>Selesai</option>
         </select>
+        <button class="btn" onclick="saveStatus('${nip}')">Save</button>
       </td>
     </tr>`;
   });
@@ -219,7 +218,6 @@ function render(arr){
 function save(nip){
   const btn = document.getElementById("b_"+nip);
   const cat = document.getElementById("c_"+nip).value;
-  const status = document.getElementById("s_"+nip).value;
 
   btn.textContent="Saving...";
   btn.classList.add("loading");
@@ -229,17 +227,26 @@ function save(nip){
     method:"POST",
     mode:"no-cors",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ nip:nip, catatan:cat, status:status })
+    body:JSON.stringify({ nip:nip, catatan:cat })
   });
 
   setTimeout(()=>{
-    btn.textContent="Saved";
-    setTimeout(()=>{
-      btn.textContent="Save";
-      btn.classList.remove("loading");
-      btn.disabled=false;
-    },900);
-  },700);
+    btn.textContent="Save";
+    btn.classList.remove("loading");
+    btn.disabled=false;
+  },900);
+}
+
+function saveStatus(nip){
+  const status = document.getElementById("s_"+nip).value;
+  if(!status) return;
+
+  fetch(GAS_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ nip:nip, status:status })
+  });
 }
 
 document.getElementById("search").oninput = e=>{
