@@ -5,7 +5,6 @@
 <title>DASHBOARD JABATAN FUNGSIONAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- ICON -->
 <link rel="stylesheet"
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -25,7 +24,6 @@ body{
   color:var(--text);
 }
 
-/* HEADER */
 header{
   padding:12px 22px;
   background:linear-gradient(135deg,#2563eb,#1e40af);
@@ -37,10 +35,8 @@ header h1{
   letter-spacing:.3px;
 }
 
-/* CONTAINER */
 .container{padding:14px}
 
-/* SEARCH */
 .search{
   max-width:320px;
   margin-bottom:10px;
@@ -53,7 +49,6 @@ header h1{
   border:1px solid #c7d2fe;
 }
 
-/* TABLE BOX */
 .table-box{
   background:var(--card);
   border-radius:14px;
@@ -62,7 +57,6 @@ header h1{
   box-shadow:0 8px 18px rgba(0,0,0,.06);
 }
 
-/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -70,7 +64,6 @@ table{
   font-size:12px;
 }
 
-/* HEADER FREEZE */
 thead th{
   position:sticky;
   top:0;
@@ -78,7 +71,6 @@ thead th{
   z-index:2;
 }
 
-/* CELL */
 th,td{
   padding:8px 10px;
   border-bottom:1px solid var(--line);
@@ -86,24 +78,22 @@ th,td{
   text-overflow:ellipsis;
 }
 
-/* COLUMN WIDTH */
-th:nth-child(1), td:nth-child(1){ width:24%; }
-th:nth-child(2), td:nth-child(2){ width:18%; }
-th:nth-child(3), td:nth-child(3){ width:14%; }
+/* COLUMN WIDTH UPDATE */
+th:nth-child(1), td:nth-child(1){ width:20%; }
+th:nth-child(2), td:nth-child(2){ width:16%; }
+th:nth-child(3), td:nth-child(3){ width:12%; }
 th:nth-child(4), td:nth-child(4){ width:6%; text-align:center; }
-th:nth-child(5), td:nth-child(5){ width:38%; }
+th:nth-child(5), td:nth-child(5){ width:28%; }
+th:nth-child(6), td:nth-child(6){ width:18%; }
 
-/* ROW */
 tbody tr:hover{background:#f1f5f9}
 
-/* NAMA PEGAWAI */
 td.nama{
   font-size:14px;
   font-weight:600;
   color:#0f172a;
 }
 
-/* CATATAN */
 .catatan{
   width:100%;
   min-height:32px;
@@ -114,7 +104,15 @@ td.nama{
   background:#f8fafc;
 }
 
-/* BUTTON */
+.status{
+  width:100%;
+  padding:6px;
+  font-size:12px;
+  border-radius:8px;
+  border:1px solid #c7d2fe;
+  background:#f8fafc;
+}
+
 .btn{
   margin-top:4px;
   font-size:11px;
@@ -130,7 +128,6 @@ td.nama{
   cursor:wait;
 }
 
-/* FOLDER ICON */
 .folder a{
   color:#2563eb;
   font-size:18px;
@@ -159,6 +156,7 @@ td.nama{
           <th>HP</th>
           <th>Folder</th>
           <th>Catatan</th>
+          <th>Pengajuan</th>
         </tr>
       </thead>
       <tbody id="rows"></tbody>
@@ -175,7 +173,6 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbybmvR69DeeJAGZUOJkllGj
 
 let data=[];
 
-/* LOAD DATA */
 fetch(SHEET)
 .then(r=>r.text())
 .then(t=>{
@@ -184,7 +181,6 @@ fetch(SHEET)
   render(data);
 });
 
-/* RENDER TABLE */
 function render(arr){
   const tb = document.getElementById("rows");
   tb.innerHTML="";
@@ -194,6 +190,7 @@ function render(arr){
     const hp = r.c[2]?.v || "";
     const folder = r.c[5]?.v || "";
     const cat = r.c[6]?.v || "";
+    const status = r.c[7]?.v || "Pengajuan";
 
     tb.innerHTML += `
     <tr>
@@ -201,7 +198,7 @@ function render(arr){
       <td>${nip}</td>
       <td>${hp}</td>
       <td class="folder">
-        <a href="${folder}" target="_blank" title="Buka Folder">
+        <a href="${folder}" target="_blank">
           <i class="fa-solid fa-folder-open"></i>
         </a>
       </td>
@@ -209,14 +206,20 @@ function render(arr){
         <textarea class="catatan" id="c_${nip}">${cat}</textarea>
         <button class="btn" id="b_${nip}" onclick="save('${nip}')">Save</button>
       </td>
+      <td>
+        <select class="status" id="s_${nip}">
+          <option value="Pengajuan" ${status==="Pengajuan"?"selected":""}>Pengajuan</option>
+          <option value="Selesai" ${status==="Selesai"?"selected":""}>Selesai</option>
+        </select>
+      </td>
     </tr>`;
   });
 }
 
-/* SAVE CATATAN */
 function save(nip){
   const btn = document.getElementById("b_"+nip);
   const cat = document.getElementById("c_"+nip).value;
+  const status = document.getElementById("s_"+nip).value;
 
   btn.textContent="Saving...";
   btn.classList.add("loading");
@@ -226,7 +229,7 @@ function save(nip){
     method:"POST",
     mode:"no-cors",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ nip:nip, catatan:cat })
+    body:JSON.stringify({ nip:nip, catatan:cat, status:status })
   });
 
   setTimeout(()=>{
@@ -239,7 +242,6 @@ function save(nip){
   },700);
 }
 
-/* SEARCH */
 document.getElementById("search").oninput = e=>{
   const q = e.target.value.toLowerCase();
   render(data.filter(r=>r.c[0]?.v.toLowerCase().includes(q)));
